@@ -158,3 +158,35 @@ if (typeof document !== "undefined") {
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", mountRuntimeNotice);
   else mountRuntimeNotice();
 }
+
+// ---------- 系统语音（TTS） ----------
+// 真人录音只覆盖 687 / 12951 句，其余句子和五十音都靠系统日语语音。
+// 系统没装 ja-JP 语音时 speechSynthesis 会静默不发声，所以必须明确告诉用户怎么装，
+// 不能让按钮点了像坏的一样。
+export function japaneseVoice() {
+  if (typeof speechSynthesis === "undefined") return null;
+  const voices = speechSynthesis.getVoices() || [];
+  return voices.find((v) => /^ja([-_]|$)/i.test(v.lang)) || null;
+}
+
+export const TTS_HINT = "系统里没有日语语音：设置 → 时间和语言 → 语言 → 添加「日本語」并勾选「语音」";
+
+export function speak(text, { rate = 0.9 } = {}) {
+  if (!text) return false;
+  if (typeof speechSynthesis === "undefined") {
+    toast("这个浏览器不支持语音合成");
+    return false;
+  }
+  const voice = japaneseVoice();
+  if (!voice) {
+    toast(TTS_HINT);
+    return false;
+  }
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = voice.lang;
+  u.voice = voice;
+  u.rate = rate;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+  return true;
+}

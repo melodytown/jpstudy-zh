@@ -26,7 +26,7 @@ from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 
 APP_ID = "jpstudy"
-VERSION = "0.4.0"
+VERSION = "0.4.1"
 HOST = "127.0.0.1"
 PRIMARY_PORT = 17321
 PORT_SPAN = 10  # 17321 … 17330

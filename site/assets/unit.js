@@ -1,5 +1,5 @@
 // 单元页：语法讲解 → 单词 → 精读 → 操练 → 完成本课
-import { $, el, getJSON, qs, rubySpan, audioBtn, toast } from "./lib.js";
+import { $, el, getJSON, qs, rubySpan, audioBtn, toast, speak, japaneseVoice } from "./lib.js";
 import { ensureUnitCards, completedUnits } from "./srs.js";
 
 const app = $("#app");
@@ -146,12 +146,20 @@ async function main() {
 
   // 精读
   app.append(sectionTitle("精读", `${unit.sentences.length} 句`));
+  const noAudio = unit.sentences.filter((s) => !s.audio).length;
+  if (noAudio) {
+    app.append(el("div", { class: "dim small" },
+      "🔊 真人录音 · 🗣 系统语音朗读",
+      japaneseVoice() ? "" : "（系统未装日语语音，🗣 会提示安装方法）"));
+  }
   for (const s of unit.sentences) {
     app.append(el("div", { class: "sentence" },
       el("div", { class: "row" },
         rubySpan(s.ruby, "ja"),
         el("div", { class: "spacer" }),
-        audioBtn(s.audio),
+        s.audio
+          ? audioBtn(s.audio)
+          : el("button", { class: "play", title: "用系统语音朗读", onclick: () => speak(s.ja) }, "🗣"),
         s.src === "tatoeba" ? el("span", { class: "badge" }, "Tatoeba") : null,
       ),
       el("div", { class: "zh" }, s.zh),

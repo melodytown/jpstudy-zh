@@ -1,5 +1,5 @@
 // 五十音表：清音/浊音/半浊音/拗音 × 平假名/片假名
-import { $, el, getJSON } from "./lib.js";
+import { $, el, getJSON, speak, japaneseVoice, TTS_HINT } from "./lib.js";
 
 const app = $("#app");
 const GROUPS = ["清音", "濁音", "半濁音", "拗音"];
@@ -32,18 +32,16 @@ async function main() {
   for (const [key, label] of [["hira", "平假名"], ["kata", "片假名"]]) {
     tabs.append(el("button", { "data-script": key, onclick: () => { script = key; localStorage.setItem("kanaScript", key); render(); } }, label));
   }
-  app.append(tabs, el("div", { class: "dim small", style: "margin-top:8px" }, "点假名可朗读（用浏览器自带日语语音）"));
+  const voice = japaneseVoice();
+  app.append(tabs, el("div", { class: "dim small", style: "margin-top:8px" },
+    voice ? `点假名可朗读（系统语音：${voice.name}）` : "点假名可朗读，但需要先安装日语语音"));
+  if (!voice) {
+    app.append(el("div", { class: "card small", style: "margin-top:10px" },
+      el("div", {}, "当前系统没有日语语音，点了不会出声。"),
+      el("div", { class: "dim", style: "margin-top:4px" }, TTS_HINT)));
+  }
   app.append(el("div", { id: "grids" }));
   render();
-}
-
-function speak(text) {
-  if (!("speechSynthesis" in window)) return;
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = "ja-JP";
-  u.rate = 0.85;
-  speechSynthesis.cancel();
-  speechSynthesis.speak(u);
 }
 
 main().catch((e) => { app.innerHTML = `<div class="empty">加载失败：${e.message}</div>`; });
