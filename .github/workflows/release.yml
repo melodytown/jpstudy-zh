@@ -1,0 +1,97 @@
+name: release
+
+# 打 tag（v0.4.0 这种）就自动构建并发布：
+#   1) 拉上游（三个 git 仓 + Tatoeba 快照），跑完整数据流水线（含 R1–R6 验收）
+#   2) 打包 N1–N5 全量音频，重新生成站点数据
+#   3) PyInstaller --onedir 打包 + 便携 zip + Inno Setup 安装包
+#   4) 上传到同 tag 的 GitHub Release
+#
+# 为什么要在这里跑流水线：仓库里只提交了 N5 的音频（33MB），全量音频有 26000+ 个文件、
+# ~350MB，不适合进 git。安装包要带全量音频，就在 CI 里现生成——runner 的网络和磁盘不要钱，
+# 本地克隆保持轻量。
+#
+# 也可以手动触发：Actions → release → Run workflow，填 tag（产物文件名跟 desktop/app.py 的 VERSION 走）。
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "发布 tag，例如 v0.4.0"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          # 03-conjugate 用 node:sqlite，需要 22.5+；这里固定 24
+          node-version: "24"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 依赖（PyInstaller + pywebview + Inno Setup）
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller pywebview
+          choco install innosetup --no-progress -y
+        shell: bash
+
+      - name: 拉上游（git 仓 + Tatoeba 快照）
+        run: npm run fetch
+        shell: bash
+
+      - name: 数据流水线（01–06：数据 + R1–R6 验收 + N5 音频）
+        run: npm run s0
+        shell: bash
+
+      - name: 全量音频（N1–N5）
+        run: npm run media:all
+        shell: bash
+
+      - name: 生成站点数据（只引用真实存在的音频）
+        run: npm run data:site
+        shell: bash
+
+      - name: 打包（onedir + 便携 zip + 安装包）
+        run: bash desktop/package.sh
+        shell: bash
+
+      - name: 列出产物
+        shell: bash
+        run: |
+          ls -lh desktop/release/
+          du -sh desktop/dist/jpstudy desktop/release/*.zip desktop/release/*.exe 2>/dev/null || true
+
+      - name: 发布到 GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+          name: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+          generate_release_notes: true
+          body: |
+            日本語 · 学习站 —— 给中文母语者的 JLPT N5–N1 自学课程（545 单元 / 10645 词 / 12951 句）。
+
+            - **安装版**：下载 `jpstudy-setup-*.exe` 双击安装（开始菜单有快捷方式，控制面板可卸载）
+            - **便携版**：下载 `jpstudy-*-windows-x64.zip`，解压后直接运行 `jpstudy.exe`
+            - 自带 **N1–N5 全量真人音频**；不用装 Python，也不用联网；学习进度只存在本机
+            - 包体较大（约 350MB）是因为音频没做压缩；exe 未做代码签名，SmartScreen 会提示“未知发布者”，点「更多信息 → 仍要运行」
+
+            数据来源与许可见 `THIRD-PARTY-NOTICES.md`（上游音频与释义为 CC BY-NC 4.0，本包仅作非商业分发）。
+          files: |
+            desktop/release/jpstudy-setup-*.exe
+            desktop/release/jpstudy-*-windows-x64.zip
+            THIRD-PARTY-NOTICES.md
+            LICENSE

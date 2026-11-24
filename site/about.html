@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>关于 · 日本語</title>
+<link rel="stylesheet" href="assets/app.css">
+</head>
+<body>
+<header class="top">
+  <span class="brand">日本語</span>
+  <nav><a href="index.html">课程</a><a href="review.html">复习</a><a href="kana.html">五十音</a><a href="about.html">关于</a></nav>
+</header>
+<main>
+  <h1>关于</h1>
+  <p class="dim">给中文母语者的 JLPT N5–N1 自学课程。纯静态页面 + 本地数据，不需要联网、没有账号，学习进度只存在这台电脑上。</p>
+
+  <h2>里面有什么</h2>
+  <ul>
+    <li>545 个单元，10645 个词，按 N5→N1 从易到难排；每个单元不超过 20 个新词、3 个语法点。</li>
+    <li>每句例句里的词都在本课或更早已教过，读句不用查词。</li>
+    <li>FSRS 间隔复习（ts-fsrs），四档自评；卡片只在完成某课时入库。</li>
+    <li>五十音表，以及每个单词、每条例句的真人音频（官方安装包含 N1–N5 全量；从源码运行时默认只打包 N5）。</li>
+  </ul>
+
+  <h2>学习数据存在哪</h2>
+  <p>全部存在本机浏览器的 IndexedDB 里（桌面版即 WebView2 的本地存储），不上传任何地方。换电脑或重装前，在首页用「导出进度」存一份 JSON，之后「导入进度」恢复。</p>
+  <p class="dim small">桌面版的进度按 <code>地址:端口</code> 隔离。如果 17321 端口被别的程序占用、程序改用了备用端口，页面顶部会有提醒——那个端口上是一套独立的进度。</p>
+
+  <h2>数据来源与许可</h2>
+  <p>课程数据是从下面这些公开数据整理出来的，音频与例句的版权归原始作者。本项目只做非商业分发。</p>
+  <div class="card">
+    <table class="small">
+      <thead><tr><th>来源</th><th>用途</th><th>许可</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://github.com/5mdld/anki-jlpt-decks" target="_blank" rel="noopener">5mdld/anki-jlpt-decks</a></td><td>中文释义、音调、例句、单词与例句音频</td><td>CC BY-NC 4.0</td></tr>
+        <tr><td><a href="https://github.com/evanclan/OpenJLPT" target="_blank" rel="noopener">evanclan/OpenJLPT</a></td><td>语法点、汉字表、英文释义、jmdict id</td><td>CC BY-SA 4.0</td></tr>
+        <tr><td><a href="https://github.com/mifunetoshiro/kanjium" target="_blank" rel="noopener">mifunetoshiro/kanjium</a></td><td>活用表（对拍验证）、音调补缺</td><td>CC BY-SA 4.0</td></tr>
+        <tr><td><a href="https://tatoeba.org" target="_blank" rel="noopener">Tatoeba</a></td><td>补充例句（日→中句对）</td><td>CC BY 2.0 FR</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="small dim">本项目自己的代码以 MIT 许可发布，见仓库 LICENSE；由上述数据生成的课程数据沿上游许可。<code>content/confusables.tsv</code>（同形异义表）与 <code>content/grammar-zh.json</code>（语法中文讲解）为本项目原创。</p>
+
+  <h2>离线打包</h2>
+  <p class="small dim">站点是纯 HTML/CSS/ESM，没有构建步骤。桌面版（jpstudy.exe）只是把这个目录用本地 HTTP 服务起来，再用 WebView2 窗口打开。没有 WebView2 的机器会自动改用默认浏览器。</p>
+
+  <p class="small"><a href="index.html">← 回课程</a></p>
+</main>
+</body>
+</html>

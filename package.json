@@ -1,0 +1,29 @@
+{
+  "name": "jpstudy",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "fetch": "bash scripts/00-fetch.sh",
+    "01": "node scripts/01-words.mjs",
+    "02": "node scripts/02-enrich.mjs",
+    "03": "node scripts/03-conjugate.mjs",
+    "04": "node scripts/04-difficulty.mjs",
+    "04b": "node scripts/04b-corpus.mjs",
+    "05": "node scripts/05-curriculum.mjs",
+    "06": "node scripts/06-lint.mjs",
+    "07": "node scripts/07-media.mjs",
+    "build:data": "node scripts/01-words.mjs && node scripts/02-enrich.mjs && node scripts/03-conjugate.mjs && node scripts/04-difficulty.mjs && node scripts/04b-corpus.mjs && node scripts/05-curriculum.mjs",
+    "lint": "node scripts/06-lint.mjs",
+    "media": "node scripts/07-media.mjs",
+    "s0": "npm run build:data && npm run lint && npm run media",
+    "test:conjugate": "node scripts/03-conjugate.mjs",
+    "08": "node scripts/08-site.mjs",
+    "data:site": "node scripts/08-site.mjs",
+    "s1": "npm run data:site",
+    "exe": "bash desktop/build.sh",
+    "serve": "python -m http.server 8080 --directory site",
+    "package": "bash desktop/package.sh",
+    "version": "python desktop/app.py --version",
+    "media:all": "node scripts/07-media.mjs --stage=5"
+  }
+}

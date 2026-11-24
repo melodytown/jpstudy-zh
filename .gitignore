@@ -1,0 +1,12 @@
+/node_modules/
+/raw/
+/data/
+/public/media/
+desktop/build/
+desktop/dist/
+desktop/*.spec
+*.log
+desktop/release/
+
+# site/data 与 site/media 是**提交的**发布产物：克隆下来就能直接 npm run serve。
+# 它们由 `npm run data:site` 从 data/ + public/media 生成，内容改动后要一起提交。
