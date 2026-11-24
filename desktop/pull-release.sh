@@ -20,13 +20,29 @@ done
 [ -n "$OUT" ] || OUT="$HOME/Desktop"
 mkdir -p "$OUT"
 
-TAG="$(gh release view --repo "$REPO" --json tagName --jq .tagName)"
+# 最新 tag 从远端 tags 推（git 协议比 api.github.com 稳），失败再退回 gh api。
+TAG=""
+for i in 1 2 3 4 5; do
+  TAG="$(git ls-remote --tags --refs origin 2>/dev/null | awk '{print $2}' | sed 's|refs/tags/||' | sort -V | tail -1)"
+  [ -n "$TAG" ] && break
+  echo "… 取 tag 失败，重试 $i"
+  sleep 3
+done
+if [ -z "$TAG" ]; then
+  for i in 1 2 3; do
+    TAG="$(gh release view --repo "$REPO" --json tagName --jq .tagName 2>/dev/null)" && [ -n "$TAG" ] && break
+    echo "… gh api 取 tag 失败，重试 $i"
+    sleep 5
+  done
+fi
+[ -n "$TAG" ] || { echo "拿不到最新 tag：检查网络或 gh auth status" >&2; exit 1; }
 VER="${TAG#v}"
 echo "latest: $TAG → $OUT"
 
-# gh 不支持断点续传；这里用带 -C - 的 curl 兜底，断了重试几次。
+# 直接用 releases/download 的固定地址（会 302 到 CDN），不再每次问 API；
+# gh 不支持断点续传，所以用 curl -C -，断了重试几次。
 asset_url() {
-  gh api "repos/$REPO/releases/tags/$TAG" --jq ".assets[]|select(.name==\"$1\")|.url"
+  echo "https://github.com/$REPO/releases/download/$TAG/$1"
 }
 grab() { # 文件名
   local name="$1" url token
