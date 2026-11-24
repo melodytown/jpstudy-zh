@@ -80,15 +80,15 @@ jobs:
         with:
           tag_name: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
           name: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+          # 每个版本只写「与上一版的差异」：差异部分交给 GitHub 自动生成（提交/PR 列表），
+          # 正文只留安装方式和固定的注意事项，避免每版重复堆功能清单。
           generate_release_notes: true
           body: |
-            日本語 · 学习站 —— 给中文母语者的 JLPT N5–N1 自学课程（545 单元 / 10645 词 / 12951 句）。
+            **安装**：`jpstudy-setup-*.exe` 双击安装（开始菜单有快捷方式，控制面板可卸载）；
+            便携版 `jpstudy-*-windows-x64.zip` 解压后直接运行 `jpstudy.exe`（同目录 `_internal/` 要保留）。
 
-            - **安装版**：下载 `jpstudy-setup-*.exe` 双击安装（开始菜单有快捷方式，控制面板可卸载）
-            - **便携版**：下载 `jpstudy-*-windows-x64.zip`，解压后直接运行 `jpstudy.exe`
-            - 自带 **N1–N5 全量真人音频**；不用装 Python，也不用联网；学习进度只存在本机
-            - 包体较大（约 350MB）是因为音频没做压缩；exe 未做代码签名，SmartScreen 会提示“未知发布者”，点「更多信息 → 仍要运行」
-
+            自带 N1–N5 全量真人音频；不用装 Python，也不用联网；学习进度只存在本机。
+            exe 未做代码签名，SmartScreen 提示“未知发布者”时点「更多信息 → 仍要运行」。
             数据来源与许可见 `THIRD-PARTY-NOTICES.md`（上游音频与释义为 CC BY-NC 4.0，本包仅作非商业分发）。
           files: |
             desktop/release/jpstudy-setup-*.exe

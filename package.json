@@ -24,6 +24,7 @@
     "serve": "python -m http.server 8080 --directory site",
     "package": "bash desktop/package.sh",
     "version": "python desktop/app.py --version",
-    "media:all": "node scripts/07-media.mjs --stage=5"
+    "media:all": "node scripts/07-media.mjs --stage=5",
+    "release:pull": "bash desktop/pull-release.sh"
   }
 }

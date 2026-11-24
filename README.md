@@ -110,7 +110,11 @@ npm run package                    # desktop/release/ 下出两个产物
 npm run media:all && npm run data:site && npm run package
 ```
 
-发到 GitHub Release 时，把这两个文件连同 `THIRD-PARTY-NOTICES.md` 一起挂上去。安装包**没有代码签名**，用户首次运行会看到 SmartScreen 警告（“更多信息 → 仍要运行”）；要消掉得买证书。
+发布由 CI 完成：推一个 `vX.Y.Z` tag，`.github/workflows/release.yml` 会在 runner 上跑流水线 + 全量音频 + 打包，然后把两个产物挂到 Release。
+
+- **Release 说明只写「与上一版的差异」**：差异由 GitHub 自动生成（提交/PR 列表），正文只留安装方式与固定的注意事项，不重复堆功能清单。
+- **本机保留最新安装包**：`npm run release:pull`（默认下到桌面，可传目录）把最新 Release 的 exe/zip 拉下来，并删掉本地其它版本。
+- 安装包**没有代码签名**，首次运行会有 SmartScreen 警告（“更多信息 → 仍要运行”）；要消掉得买证书。
 
 ## 许可
 
